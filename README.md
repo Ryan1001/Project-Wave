@@ -1,2 +1,2 @@
-# Project-Wave
-Project Wave for Ryan and Evan
+# Super Project X
+for Ryan and Evan
