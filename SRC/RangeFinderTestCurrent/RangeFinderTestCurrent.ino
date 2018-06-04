@@ -1,9 +1,14 @@
+#include <Filter.h>
+#include <firFilter.h>
+#include <iirFilter.h>
+#include <medianFilter.h>
+#include <newFilter.h>
 
 
 /*
-   created by Rui Santos, http://randomnerdtutorials.com
-
-   Complete Guide for Ultrasonic Sensor HC-SR04
+Project Wave
+by Ryan Brill and Evan Brill
+Last updated June 2, 2018 at home.
 
     Ultrasonic sensor Pins:
         VCC: +5VDC
@@ -114,3 +119,4 @@ void MIDImessage(byte command, byte data1, byte data2) {
   Serial.write(data1);
   Serial.write(data2);
 }
+
