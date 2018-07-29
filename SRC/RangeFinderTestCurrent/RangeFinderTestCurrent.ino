@@ -16,6 +16,7 @@ Last updated June 2, 2018 at home.
         GND: GND
 */
 //---- In this part, I declare all of the variables that I'm going to use in the loop() function----
+  //for smoothing. The higher the number the smoother the curve, but also the slower the response to changes
   const int numReadings = 30;
 
   int readings[numReadings];      // the readings from the analog input
@@ -23,21 +24,20 @@ Last updated June 2, 2018 at home.
   int total = 0;                  // the running total
 
   int upperLimit = 5000;  //the upper admissible signal reading. Helps prevent wild readings from being passed through.
-  int lowerLimit = 0; //you get the idea
+  int lowerLimit = 30; //you get the idea
 
   int trigPin = 11;    //Trig - green Jumper
   int echoPin = 12;    //Echo - yellow Jumper
   long duration, output; //duration is the output of the sensor
   int average = 0;                // the output of the moving average function 
-  int gatedOutput = 0;                 // output of sensor after gating
+  int finalOutput = 0;                 // output of sensor after gating
   int medianFiltered;     //after we gate the output, we put it through a median Filter
 
   medianFilter thisMedianFilter;
 
 
   //MIDI variables
-  byte noteON = 144;//note on command
-  byte noteOFF = 128;//note off command
+  byte continuousController = 0xB0;
 
 //-----In this part, I tell the arduino which pins to listen on (Input) or to send messages out of (Output)
 void setup() {
@@ -104,23 +104,21 @@ void loop()
   //remove high and low values. 
     //Sensor tends to report crazy values on changes - this and smoothing corrects that.
     if (average < upperLimit && average > lowerLimit) {
-      gatedOutput = average;
+      finalOutput = average;
     };
 
     
-//  gatedOutput = map(gatedOutput, 0, 3300, 0, 127);
+ finalOutput = map(finalOutput, 0, 3300, 0, 127);
 
-  Serial.println(gatedOutput);
+//  Serial.println(finalOutput);
 
   delay(20);
 
-//Send MIDI messages with our sensor data. 
-  // Note that you need to comment out the first line if you want to get Serial Plotter to display correctly.
+//Send MIDI messages with our sensor data. We are sending it with a "Continuous Controller" Command byte instead of NoteON, like we had it before
+  // Note that you need to comment out this line if you want to get Serial Plotter to display correctly.
 
-//MIDImessage(noteON, 60, medianFiltered);//turn note on
-//    delay(300);//hold note for 300ms
-//    MIDImessage(noteOFF, 60, gatedOutput);//turn note off (note on with velocity 0)
-//    delay(200);//wait 200ms until triggering next note
+MIDImessage(continuousController, 60, finalOutput);//turn note on
+
 }
 
 //send MIDI message. This is a helper method that is referenced in loop()
@@ -129,5 +127,6 @@ void MIDImessage(byte command, byte data1, byte data2) {
   Serial.write(data1);
   Serial.write(data2);
 }
+
 
 
